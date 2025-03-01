@@ -1,0 +1,40 @@
+################################################################################
+# Node-RED Stack or Compose
+################################################################################
+# docker stack deploy node-red --compose-file docker-compose-node-red.yml
+# docker-compose -f docker-compose-node-red.yml -p myNoderedProject up
+################################################################################
+version: "3.7"
+
+services:
+  node-red:
+    image: nodered/node-red:3.1
+    mem_limit: 4G
+    cpus: 2.0
+    environment:
+      - TZ=Europe/Paris
+    ports:
+      - "1880:1880"
+    networks:
+      - web
+      - node-red-net
+      - bmongo-network
+    volumes:
+      - node-red-data:/data
+    #command: bash -c "npm install node-red-node-mongodb && sleep 10 && npm start -- --userDir /data" 
+    #sleep pour s'assurer que mongo est installer
+    labels:
+      # - "traefik.enable=true"
+      # - "traefik.frontend.rule=Host:xyz.abc.com"
+      # - "traefik.docker.network=web"
+      # - "traefik.http.services.node-red.loadbalancer.server.port=1880"
+volumes:
+  node-red-data:
+networks:
+  mongo-network: 
+    name: mongo-network
+    external: true #le network est crée par le compose de mongo
+  node-red-net:
+    name: node-red-net
+  web:
+    external: true
