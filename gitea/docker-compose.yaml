@@ -1,0 +1,60 @@
+version: '2.4'
+
+services:
+  db:
+    image: postgres:14
+    volumes:
+      - gitea_tahiry_postgres_db_data:/var/lib/postgresql/data
+    restart: always
+    mem_limit: 2G
+    cpus: 2.0
+    environment:
+      - POSTGRES_USER=gitea-tahiry-user
+      - POSTGRES_PASSWORD=tyututu
+      - POSTGRES_DB=gitea-tahiry
+    networks:
+      - gitea_tahiry_db_network
+
+  gitea-tahiry-gitea:
+    depends_on:
+      - db
+    image: gitea/gitea:1.21.4
+   # ports:
+     # - "8001:8080"
+    restart: always
+    mem_limit: 2G
+    cpus: 2.0
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - GITEA__database__DB_TYPE=postgres
+      - GITEA__database__HOST=db:5432
+      - GITEA__database__NAME=gitea-tahiry
+      - GITEA__database__USER=gitea-tahiry-user
+      - GITEA__database__PASSWD=hggjghjghjghj
+      - GITEA__security__SECRET_KEY=F391e0a2xYbqyHFxUtyOtANSZs05ZIvMWWBLwtCE8s0mFfuee79LiZhwJ4a78UTa
+      - GITEA__security__INTERNAL_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE3MDc2OTY0NzJ9.QX2GWlUNX7NIGA-a_YrOvDTt-9aV8yEydPeqYe8dhmw
+    volumes:
+      - gitea-gitea:/data
+      - gitea-timezone:/etc/timezone:ro
+      - gitea-localtime:/etc/localtime:ro
+    networks:
+      - gitea_tahiry_db_network
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.frontend.rule=Host:tahiry.kahiether.com"  # Replace with your domain
+
+networks:
+  gitea_tahiry_db_network:
+    name: gitea_tahiry_db_network
+    driver: bridge
+  web:
+    external: true
+
+volumes:
+  gitea_tahiry_postgres_db_data:
+  gitea-gitea:
+  gitea-timezone:
+  gitea-localtime:
