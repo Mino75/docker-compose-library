@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  postfix-epochta:
+    image: catatnight/postfix
+    container_name: postfix
+    environment:
+      maildomain: cbvcba.kahiether.com
+      smtp_user: cbvcb:cvbcb
+    ports:
+      - "25:25"
+    volumes:
+      - ./data:/var/spool/postfix
+      - ./config:/etc/postfix
+    restart: always
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
