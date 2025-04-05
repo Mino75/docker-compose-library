@@ -1,0 +1,52 @@
+version: "3"
+services:
+
+  etherpaddb:
+    image: postgres:11-alpine
+    environment:
+      POSTGRES_DB: etherpaddb
+      POSTGRES_PASSWORD: etherpadrocks
+      POSTGRES_USER: etherpad
+    logging:
+      driver: "none"
+    restart: unless-stopped
+    volumes:
+      - etherpad-db-data:/var/lib/postgresql/data
+    labels:
+      - "traefik.enable=false"
+    networks:
+      - etherpad
+
+  etherpad:
+    image: etherpad/etherpad:1.8
+    mem_limit: 2G
+    cpus: 2.0
+    depends_on:
+      - etherpaddb
+    environment:
+      DB_TYPE: postgres
+      DB_HOST: etherpaddb
+      DB_PORT: 5432
+      DB_USER: etherpad
+      DB_PASS: etherpadrocks
+      DB_NAME: etherpaddb
+      ADMIN_PASSWORD: ertret
+      USER_PASSWORD: etreter
+      TRUST_PROXY: 'true'
+#      REQUIRE_SESSION: 'true'
+#      REQUIRE_AUTHENTICATION: 'true'
+    restart: unless-stopped
+ #   expose:
+#      - 9001
+    networks:
+      - web
+      - etherpad
+      
+volumes:
+  etherpad-db-data:
+  
+networks:
+  etherpad:
+    name: etherpad
+  web:
+    external: true
